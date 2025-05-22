@@ -25,6 +25,11 @@ pipeline {
                 git branch: 'dev', url: 'https://github.com/Vikasghandge/HOST-STAR-CLONE.git'
             }
         }
+        stage('File System Scan') {
+            steps {
+                sh "trivy fs --security-checks vuln,config --format table -o trivy-fs-report.html ."
+            }
+        }
 
         stage('SonarQube Analysis') {
             steps {
