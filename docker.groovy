@@ -9,7 +9,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'ghandgevikas/hoststar:latest'
         SCANNER_HOME = tool 'sonar-scanner'
-        CLUSTER_NAME = 'EKS_CLOUD'
+        CLUSTER_NAME = 'EKS-CLOUD'
         REGION = 'ap-south-1'
     }
 
@@ -23,11 +23,6 @@ pipeline {
         stage('Checkout from Git') {
             steps {
                 git branch: 'dev', url: 'https://github.com/Vikasghandge/HOST-STAR-CLONE.git'
-            }
-        }
-        stage('File System Scan') {
-            steps {
-                sh "trivy fs --security-checks vuln,config --format table -o trivy-fs-report.html ."
             }
         }
 
@@ -57,14 +52,15 @@ pipeline {
             }
         }
 
-    
-       //  stage('OWASP FS SCAN') {
-        //    steps {
-         //     dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-         //        dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
-      
+       // /*
+        // Optional: OWASP Dependency Check
+    //    stage('OWASP FS SCAN') {
+      //      steps {
+      //          dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+//                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+  //          }
+//        }
+  //      */
 
         stage('Docker Scout FS') {
             steps {
@@ -102,26 +98,10 @@ pipeline {
             }
         }
 
-      //  /*
-     //   stage('Deploy Docker Locally') {
-     //       steps {
-    //            sh "docker run -d --name hotstar -p 3000:3000 ${DOCKER_IMAGE}"
-    //        }
-      //  }
-     //   */
-
-        stage('Deploy to Kubernetes') {
+        stage('Deploy Docker Locally') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'k8s']]) {
-                    dir('Hotstar-Clone-main/K8S') {
-                        sh '''
-                            aws eks --region ap-south-1 update-kubeconfig --name EKS_CLOUD
-                            kubectl apply -f deployment.yml
-                            kubectl apply -f service.yml
-                        '''
-                    }
-                }
+               sh "docker run -d --name hotstar -p 3000:3000 ${DOCKER_IMAGE}"
             }
         }
-    }
-}
+
+        
