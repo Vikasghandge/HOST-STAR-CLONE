@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hotstar-deployment
 spec:
-  replicas: 1  # Number of desired replicas
+  replicas: 10  # Number of desired replicas
   selector:
     matchLabels:
       app: hotstar
